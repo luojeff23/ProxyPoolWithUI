@@ -11,8 +11,19 @@ import time
 from db import conn
 from fetchers import fetchers
 from config import PROC_FETCHER_SLEEP
-from func_timeout import func_set_timeout
-from func_timeout.exceptions import FunctionTimedOut
+
+try:
+    from func_timeout import func_set_timeout
+    from func_timeout.exceptions import FunctionTimedOut
+except ImportError:
+    # 在缺少func-timeout依赖时退化为普通调用，避免启动失败
+    def func_set_timeout(_timeout_seconds):
+        def decorator(func):
+            return func
+        return decorator
+
+    class FunctionTimedOut(TimeoutError):
+        pass
 
 logging.basicConfig(stream=sys.stdout, format="%(asctime)s-%(levelname)s:%(name)s:%(message)s", level='INFO')
 
@@ -54,13 +65,16 @@ def main(proc_lock):
             try:
                 proxies = fetch_worker(fetcher)
                 que.put((name, proxies))
+            except FunctionTimedOut:
+                conn.pushFetcherError(name, 'fetch worker timeout')
+                que.put((name, []))
             except Exception as e:
                 logger.error(f'运行爬取器{name}出错：' + str(e))
+                conn.pushFetcherError(name, str(e))
                 que.put((name, []))
-            except FunctionTimedOut:
-                pass
 
         threads = []
+        enabled_fetchers = []
         que = Queue()
         for item in fetchers:
             data = conn.getFetcher(item.name)
@@ -70,14 +84,33 @@ def main(proc_lock):
             if not data.enable:
                 logger.info(f'跳过爬取器{item.name}')
                 continue
-            threads.append(threading.Thread(target=run_thread, args=(item.name, item.fetcher, que)))
+            enabled_fetchers.append(item.name)
+            threads.append(
+                threading.Thread(
+                    target=run_thread,
+                    args=(item.name, item.fetcher, que),
+                    name=f'fetcher:{item.name}',
+                    daemon=True
+                )
+            )
         [t.start() for t in threads]
-        [t.join() for t in threads]
+        round_deadline = time.time() + 35
+        for t in threads:
+            remaining = round_deadline - time.time()
+            if remaining > 0:
+                t.join(timeout=remaining)
+            if t.is_alive():
+                logger.error(f'爬取线程执行超时：{t.name}')
+                conn.pushFetcherError(t.name.replace('fetcher:', ''), 'thread join timeout')
+
+        fetcher_results = {name: 0 for name in enabled_fetchers}
         while not que.empty():
             fetcher_name, proxies = que.get()
+            fetcher_results[fetcher_name] = len(proxies)
             for proxy in proxies:
                 conn.pushNewFetch(fetcher_name, proxy[0], proxy[1], proxy[2])
-            conn.pushFetcherResult(fetcher_name, len(proxies))
+        for fetcher_name, proxies_cnt in fetcher_results.items():
+            conn.pushFetcherResult(fetcher_name, proxies_cnt)
         
         logger.info(f'完成运行{len(threads)}个爬取器，睡眠{PROC_FETCHER_SLEEP}秒')
         time.sleep(PROC_FETCHER_SLEEP)

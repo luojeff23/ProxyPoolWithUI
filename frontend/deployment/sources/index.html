@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proxy Console - Sources</title>
+    <link rel="stylesheet" href="/web/assets/console.css" />
+</head>
+<body data-page="sources">
+    <div class="app">
+        <aside class="side">
+            <div class="logo">Proxy Console</div>
+            <nav class="menu">
+                <a data-key="dashboard" href="/web/dashboard">控制台总览</a>
+                <a data-key="proxies" href="/web/proxies">代理池管理</a>
+                <a data-key="sources" href="/web/sources">代理源管理</a>
+                <a data-key="fetchers" href="/web/fetchers">抓取器管理</a>
+                <a data-key="system" href="/web/system">系统与维护</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="toolbar">
+                <button id="refreshBtn">重新加载</button>
+                <button id="saveBtn">校验并保存</button>
+                <span id="status" class="muted"></span>
+            </div>
+
+            <section class="card">
+                <div class="kv">配置文件路径: <code id="sourcePath">-</code></div>
+                <div class="kv" style="margin-top:6px">有效源数量: <span id="validSourceCnt">0</span></div>
+                <p class="muted">格式: `protocol,url` 或 `url`。空行和 `#` 注释会忽略。</p>
+                <textarea id="sourceEditor" style="width:100%;min-height:300px"></textarea>
+            </section>
+
+            <section class="card">
+                <h3>本地校验错误</h3>
+                <table>
+                    <thead>
+                        <tr><th>行号</th><th>内容</th><th>问题</th></tr>
+                    </thead>
+                    <tbody id="sourceInvalidBody"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    <script src="/web/assets/console.js"></script>
+</body>
+</html>

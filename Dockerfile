@@ -1,6 +1,8 @@
-FROM python:3.7.0
+FROM python:3.12-slim
 
 WORKDIR /proxy
+ENV PYTHONUNBUFFERED=1
+ENV API_HOST=0.0.0.0
 
 ADD requirements.txt /proxy
 RUN pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple/

@@ -1,0 +1,172 @@
+:root {
+    --bg: #0b1220;
+    --panel: #111827;
+    --panel-soft: #1f2937;
+    --line: #273244;
+    --text: #e5e7eb;
+    --sub: #9ca3af;
+    --good: #16a34a;
+    --warn: #d97706;
+    --bad: #dc2626;
+    --accent: #0ea5e9;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    background: linear-gradient(145deg, #020617 0%, #0f172a 100%);
+}
+
+.app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+}
+
+.side {
+    background: #020617;
+    border-right: 1px solid var(--line);
+    padding: 14px;
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.menu a {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: transparent;
+}
+
+.menu a:hover,
+.menu a.active {
+    background: var(--panel-soft);
+}
+
+.main {
+    padding: 16px;
+}
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.kv {
+    color: var(--sub);
+    font-size: 13px;
+}
+
+.num {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+}
+
+th,
+td {
+    border: 1px solid var(--line);
+    padding: 8px;
+    font-size: 13px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #0f172a;
+}
+
+input,
+select,
+textarea,
+button {
+    background: #0f172a;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:hover {
+    border-color: var(--accent);
+}
+
+.muted {
+    color: var(--sub);
+}
+
+.status-good {
+    color: #86efac;
+}
+
+.status-bad {
+    color: #fca5a5;
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.danger {
+    border-color: #7f1d1d;
+    background: #450a0a;
+}
+
+.pagination {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+@media (max-width: 860px) {
+    .app {
+        grid-template-columns: 1fr;
+    }
+    .side {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+    }
+}

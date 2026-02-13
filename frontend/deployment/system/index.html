@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Proxy Console - Fetchers</title>
+    <title>Proxy Console - System</title>
     <link rel="stylesheet" href="/web/assets/console.css" />
 </head>
-<body data-page="fetchers">
+<body data-page="system">
     <div class="app">
         <aside class="side">
             <div class="logo">Proxy Console</div>
@@ -22,32 +22,30 @@
             <div class="toolbar">
                 <button id="refreshBtn">刷新</button>
                 <label class="row"><input id="autoRefresh" type="checkbox" checked /> 自动刷新</label>
-                <input id="clearStatsToken" placeholder="输入 CLEAR_FETCHERS_STATS" />
-                <button id="clearStatsBtn" class="danger">清空抓取器统计</button>
                 <span id="status" class="muted"></span>
             </div>
 
             <section class="cards">
-                <div class="card"><div class="kv">抓取器总数</div><div id="fetcherCount" class="num">-</div></div>
-                <div class="card"><div class="kv">已启用抓取器</div><div id="enabledCount" class="num">-</div></div>
-                <div class="card"><div class="kv">上次刷新</div><div id="lastFetchersRefresh" class="num" style="font-size:16px">-</div></div>
+                <div class="card"><div class="kv">API状态</div><div id="apiHealth" class="num">-</div></div>
+                <div class="card"><div class="kv">数据库状态</div><div id="dbHealth" class="num">-</div></div>
+                <div class="card"><div class="kv">已注册抓取器</div><div id="registeredFetchers" class="num">-</div></div>
             </section>
 
             <section class="card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>名称</th>
-                            <th>当前可用代理数量</th>
-                            <th>数据库中的代理数量</th>
-                            <th>总共爬取代理数量</th>
-                            <th>上次爬取代理数量</th>
-                            <th>上次爬取时间</th>
-                            <th>启用</th>
-                        </tr>
-                    </thead>
-                    <tbody id="fetchersBody"></tbody>
-                </table>
+                <h3>运行配置（只读）</h3>
+                <pre id="runtimeConfig" style="white-space:pre-wrap"></pre>
+            </section>
+
+            <section class="card">
+                <h3>危险操作（输入确认词 + 二次确认）</h3>
+                <div class="row" style="margin-bottom:10px">
+                    <input id="clearStatsToken" placeholder="CLEAR_FETCHERS_STATS" />
+                    <button id="clearStatsBtn" class="danger">清空抓取器统计</button>
+                </div>
+                <div class="row">
+                    <input id="clearProxiesToken" placeholder="CLEAR_PROXIES" />
+                    <button id="clearProxiesBtn" class="danger">清空代理池</button>
+                </div>
             </section>
         </main>
     </div>

@@ -1,62 +1,63 @@
 <template>
     <div>
-        <a-row :gutter="16">
-            <a-col :span="4">
-                <a-card :body-style="{padding: '20px 24px 4px'}">
-                    <p>
-                        自动刷新:
-                        <a-switch v-model="autoupdate" />
-                    </p>
-                    <p>刷新时间：{{ lastupdate }}</p>
+        <a-row :gutter="12">
+            <a-col :xs="24" :md="6">
+                <a-card>
+                    <a-statistic title="抓取器总数" :value="fetchers.length" />
                 </a-card>
             </a-col>
-            <a-col :span="4">
-                <a-card :body-style="{padding: '20px 24px 43px'}">
-                    <div style="text-align: center">
-                        <a-button type="primary" @click="clearStatus">
-                            清空统计信息
-                        </a-button>
-                        <a-tooltip title="清空`总共爬取代理数量`等，已经爬取到的代理不会删除">
-                            <a-icon type="question-circle" />
-                        </a-tooltip>
+            <a-col :xs="24" :md="6">
+                <a-card>
+                    <a-statistic title="已启用抓取器" :value="enabledCount" />
+                </a-card>
+            </a-col>
+            <a-col :xs="24" :md="6">
+                <a-card>
+                    <a-statistic title="自动刷新" :value="autoupdate ? 'ON' : 'OFF'" />
+                    <a-switch v-model="autoupdate" />
+                </a-card>
+            </a-col>
+            <a-col :xs="24" :md="6">
+                <a-card>
+                    <div>上次刷新：{{ lastupdate || '-' }}</div>
+                    <div style="margin-top: 8px">
+                        <a-input
+                            v-model="confirmText"
+                            placeholder="输入 CLEAR_FETCHERS_STATS"
+                            size="small"
+                            style="margin-bottom: 8px"
+                        />
+                        <a-popconfirm
+                            title="确认清空抓取器统计？"
+                            ok-text="确认"
+                            cancel-text="取消"
+                            @confirm="clearStatus"
+                        >
+                            <a-button
+                                type="danger"
+                                size="small"
+                                :disabled="confirmText !== 'CLEAR_FETCHERS_STATS'"
+                            >
+                                清空统计
+                            </a-button>
+                        </a-popconfirm>
                     </div>
                 </a-card>
             </a-col>
         </a-row>
-        <br />
+
         <a-table
+            style="margin-top: 12px"
             :columns="columns"
             :data-source="fetchers"
             row-key="name"
             :pagination="false"
+            :loading="loading"
             :bordered="true"
         >
-            <span slot="inDbCntTitle">
-                数据库中的代理数量
-                <a-tooltip>
-                    <template #title>
-                        <span>
-                            当前数据库中，有多少代理是这个爬取器爬到的。
-                            和`总共爬取代理数量`不同的地方在于，这个去掉了重复的和已经删除的代理。
-                        </span>
-                    </template>
-                    <a-icon type="question-circle" />
-                </a-tooltip>
+            <span slot="enable" slot-scope="enable, record">
+                <a-switch :checked="enable" @change="(checked) => enableChange(record, checked)" />
             </span>
-            <span slot="enableTitle">
-                是否启用
-                <a-tooltip>
-                    <template #title>
-                        <span>
-                            在禁用之后，将不会再运行该爬取器。
-                        </span>
-                    </template>
-                    <a-icon type="question-circle" />
-                </a-tooltip>
-            </span>
-            <template slot="enable" slot-scope="enable, record">
-                <a-switch :default-checked="enable" @change="enableChange(record)" />
-            </template>
         </a-table>
     </div>
 </template>
@@ -71,43 +72,39 @@ const columns = [
     },
     {
         title: '当前可用代理数量',
-        dataIndex: 'validated_cnt'
+        dataIndex: 'validated_cnt',
+        width: 140
     },
     {
+        title: '数据库中的代理数量',
         dataIndex: 'in_db_cnt',
-        slots: { title: 'inDbCntTitle' }
+        width: 150
     },
     {
         title: '总共爬取代理数量',
-        dataIndex: 'sum_proxies_cnt'
+        dataIndex: 'sum_proxies_cnt',
+        width: 150
     },
     {
         title: '上次爬取代理数量',
-        dataIndex: 'last_proxies_cnt'
+        dataIndex: 'last_proxies_cnt',
+        width: 150
     },
     {
         title: '上次爬取时间',
         dataIndex: 'last_fetch_date',
+        width: 180,
         customRender: (date) => {
-            return date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '';
+            return date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '-';
         }
     },
     {
+        title: '启用',
         dataIndex: 'enable',
-        slots: { title: 'enableTitle' },
+        width: 90,
         scopedSlots: { customRender: 'enable' }
     }
 ];
-
-// const data = [
-//     {
-//         name: '1',
-//         enable: true,
-//         sum_proxies_cnt: 308,
-//         last_proxies_cnt: 20,
-//         last_fetch_date: moment().toDate()
-//     }
-// ];
 
 export default {
     data () {
@@ -116,36 +113,54 @@ export default {
             columns,
             autoupdate: true,
             lastupdate: '',
+            loading: false,
+            confirmText: '',
             handle: null
         };
     },
+    computed: {
+        enabledCount () {
+            return this.fetchers.filter(item => item.enable).length;
+        }
+    },
     mounted () {
         this.handle = setInterval(() => {
-            if (this.autoupdate) { this.update(); }
-        }, 2000);
+            if (this.autoupdate) {
+                this.update();
+            }
+        }, 3000);
         this.update();
     },
     destroyed () {
-        if (this.handle) { clearInterval(this.handle); }
+        if (this.handle) {
+            clearInterval(this.handle);
+        }
         this.handle = null;
     },
     methods: {
         async update () {
-            const data = await this.$http.get('/fetchers_status');
-            this.fetchers = data.fetchers;
-            this.lastupdate = moment().format('HH:mm:ss');
+            this.loading = true;
+            try {
+                const data = await this.$http.get('/admin/summary');
+                this.fetchers = data.fetchers || [];
+                this.lastupdate = moment().format('HH:mm:ss');
+            } finally {
+                this.loading = false;
+            }
         },
         async clearStatus () {
-            await this.$http.get('/clear_fetchers_status');
-            this.$message.success('清空成功');
+            await this.$http.post('/admin/maintenance/clear_fetchers_stats', {}, {
+                confirm_text: this.confirmText
+            });
+            this.$message.success('抓取器统计已清空');
+            this.confirmText = '';
             await this.update();
         },
-        async enableChange (fetcher) {
-            if (fetcher.enable) {
-                await this.$http.get('/fetcher_enable', { name: fetcher.name, enable: '0' });
-            } else {
-                await this.$http.get('/fetcher_enable', { name: fetcher.name, enable: '1' });
-            }
+        async enableChange (fetcher, checked) {
+            await this.$http.get('/fetcher_enable', {
+                name: fetcher.name,
+                enable: checked ? '1' : '0'
+            });
             this.$message.success('修改成功');
             await this.update();
         }

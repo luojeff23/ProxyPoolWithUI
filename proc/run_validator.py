@@ -10,11 +10,22 @@ from queue import Queue
 import logging
 import time
 import requests
-from func_timeout import func_set_timeout
-from func_timeout.exceptions import FunctionTimedOut
 from db import conn
 from config import PROC_VALIDATOR_SLEEP, VALIDATE_THREAD_NUM
 from config import VALIDATE_METHOD, VALIDATE_KEYWORD, VALIDATE_HEADER, VALIDATE_URL, VALIDATE_TIMEOUT, VALIDATE_MAX_FAILS
+
+try:
+    from func_timeout import func_set_timeout
+    from func_timeout.exceptions import FunctionTimedOut
+except ImportError:
+    # 在缺少func-timeout依赖时退化为普通调用，避免启动失败
+    def func_set_timeout(_timeout_seconds):
+        def decorator(func):
+            return func
+        return decorator
+
+    class FunctionTimedOut(TimeoutError):
+        pass
 
 logging.basicConfig(stream=sys.stdout, format="%(asctime)s-%(levelname)s:%(name)s:%(message)s", level='INFO')
 

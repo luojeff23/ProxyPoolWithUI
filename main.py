@@ -66,7 +66,7 @@ def citest():
 
     for p in processes:
         assert p.process is None
-        p.process = Process(target=p.target, name=p.name, daemon=False)
+        p.process = Process(target=p.target, name=p.name, daemon=False, args=(proc_lock, ))
         p.process.start()
         print(f'running {p.name}, pid={p.process.pid}')
         p.start_time = time.time()

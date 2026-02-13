@@ -3,10 +3,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Proxy Console - Fetchers</title>
+    <title>Proxy Console - Dashboard</title>
     <link rel="stylesheet" href="/web/assets/console.css" />
 </head>
-<body data-page="fetchers">
+<body data-page="dashboard">
     <div class="app">
         <aside class="side">
             <div class="logo">Proxy Console</div>
@@ -20,33 +20,36 @@
         </aside>
         <main class="main">
             <div class="toolbar">
-                <button id="refreshBtn">刷新</button>
+                <button id="refreshBtn">立即刷新</button>
                 <label class="row"><input id="autoRefresh" type="checkbox" checked /> 自动刷新</label>
-                <input id="clearStatsToken" placeholder="输入 CLEAR_FETCHERS_STATS" />
-                <button id="clearStatsBtn" class="danger">清空抓取器统计</button>
                 <span id="status" class="muted"></span>
             </div>
 
             <section class="cards">
-                <div class="card"><div class="kv">抓取器总数</div><div id="fetcherCount" class="num">-</div></div>
-                <div class="card"><div class="kv">已启用抓取器</div><div id="enabledCount" class="num">-</div></div>
-                <div class="card"><div class="kv">上次刷新</div><div id="lastFetchersRefresh" class="num" style="font-size:16px">-</div></div>
+                <div class="card"><div class="kv">总代理数量</div><div id="sumProxies" class="num">-</div></div>
+                <div class="card"><div class="kv">可用代理数量</div><div id="validatedProxies" class="num">-</div></div>
+                <div class="card"><div class="kv">待验证数量</div><div id="pendingProxies" class="num">-</div></div>
+                <div class="card"><div class="kv">已启用抓取器</div><div id="enabledFetchers" class="num">-</div></div>
+                <div class="card"><div class="kv">运行健康</div><div id="healthText" class="num" style="font-size:16px">-</div></div>
             </section>
 
             <section class="card">
+                <h3>协议分布</h3>
                 <table>
                     <thead>
-                        <tr>
-                            <th>名称</th>
-                            <th>当前可用代理数量</th>
-                            <th>数据库中的代理数量</th>
-                            <th>总共爬取代理数量</th>
-                            <th>上次爬取代理数量</th>
-                            <th>上次爬取时间</th>
-                            <th>启用</th>
-                        </tr>
+                        <tr><th>协议</th><th>总数</th><th>可用数</th></tr>
                     </thead>
-                    <tbody id="fetchersBody"></tbody>
+                    <tbody id="protocolBody"></tbody>
+                </table>
+            </section>
+
+            <section class="card">
+                <h3>最近抓取错误</h3>
+                <table>
+                    <thead>
+                        <tr><th>抓取器</th><th>时间</th><th>错误信息</th></tr>
+                    </thead>
+                    <tbody id="errorsBody"></tbody>
                 </table>
             </section>
         </main>

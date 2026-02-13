@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proxy Console - Proxies</title>
+    <link rel="stylesheet" href="/web/assets/console.css" />
+</head>
+<body data-page="proxies">
+    <div class="app">
+        <aside class="side">
+            <div class="logo">Proxy Console</div>
+            <nav class="menu">
+                <a data-key="dashboard" href="/web/dashboard">控制台总览</a>
+                <a data-key="proxies" href="/web/proxies">代理池管理</a>
+                <a data-key="sources" href="/web/sources">代理源管理</a>
+                <a data-key="fetchers" href="/web/fetchers">抓取器管理</a>
+                <a data-key="system" href="/web/system">系统与维护</a>
+            </nav>
+        </aside>
+        <main class="main">
+            <div class="toolbar">
+                <select id="protocolFilter">
+                    <option value="all">全部协议</option>
+                    <option value="http">http</option>
+                    <option value="https">https</option>
+                    <option value="socks4">socks4</option>
+                    <option value="socks5">socks5</option>
+                </select>
+                <select id="validatedFilter">
+                    <option value="all">全部状态</option>
+                    <option value="true">仅可用</option>
+                    <option value="false">仅不可用</option>
+                </select>
+                <select id="fetcherFilter">
+                    <option value="all">全部来源</option>
+                </select>
+                <input id="keywordFilter" placeholder="搜索IP/端口/来源" />
+                <select id="pageSize">
+                    <option value="20">20</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                </select>
+                <button id="searchBtn">筛选</button>
+                <button id="refreshBtn">刷新</button>
+                <button id="exportBtn">导出CSV</button>
+                <label class="row"><input id="autoRefresh" type="checkbox" checked /> 自动刷新</label>
+                <span id="status" class="muted"></span>
+            </div>
+
+            <section class="card">
+                <div class="row">
+                    <strong>筛选结果总数:</strong> <span id="totalCnt">0</span>
+                </div>
+            </section>
+
+            <section class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>来源</th>
+                            <th>协议</th>
+                            <th>IP</th>
+                            <th>端口</th>
+                            <th>状态</th>
+                            <th>延迟(ms)</th>
+                            <th>上次验证时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="proxiesBody"></tbody>
+                </table>
+                <div class="pagination">
+                    <button id="prevPageBtn">上一页</button>
+                    <span id="pageInfo">第 1 页</span>
+                    <button id="nextPageBtn">下一页</button>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/web/assets/console.js"></script>
+</body>
+</html>

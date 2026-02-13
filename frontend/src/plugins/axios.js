@@ -61,6 +61,12 @@ class Http {
         data = data || {};
         return await handle(instance.post(url, data, { params }));
     }
+
+    async put (url, params, data) {
+        params = params || {};
+        data = data || {};
+        return await handle(instance.put(url, data, { params }));
+    }
 }
 
 export default ({ req }, inject) => {

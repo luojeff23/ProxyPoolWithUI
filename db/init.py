@@ -3,6 +3,7 @@
 from config import DATABASE_PATH
 from .Proxy import Proxy
 from .Fetcher import Fetcher
+from .FetcherError import FetcherError
 from fetchers import fetchers
 import sqlite3
 
@@ -13,7 +14,7 @@ def init():
 
     conn = sqlite3.connect(DATABASE_PATH)
 
-    create_tables = Proxy.ddls + Fetcher.ddls
+    create_tables = Proxy.ddls + Fetcher.ddls + FetcherError.ddls
     for sql in create_tables:
         conn.execute(sql)
         conn.commit()
